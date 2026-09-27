@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .controls {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    select, button {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .btn {
+        background: var(--govt-blue);
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+    .alert-green { background-color: #d4edda; color: #155724; padding: 2px 5px; border-radius: 3px; font-weight: bold;}
+    .alert-yellow { background-color: #fff3cd; color: #856404; padding: 2px 5px; border-radius: 3px; font-weight: bold;}
+    .alert-orange { background-color: #ffe8cc; color: #d35400; padding: 2px 5px; border-radius: 3px; font-weight: bold;}
+    .alert-red { background-color: #f8d7da; color: #721c24; padding: 2px 5px; border-radius: 3px; font-weight: bold;}
+</style>
+
+<h2>District-Level Forecast Data</h2>
+
+<div class="controls">
+    <div>
+        <label><strong>Filter by State: </strong></label>
+        <select id="stateSelect" onchange="loadData()">
+            <option value="">All States</option>
+            {% for state in states %}
+                <option value="{{ state }}">{{ state }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <button class="btn" onclick="alert('Exporting CSV...')">📄 Download CSV</button>
+        <button class="btn" onclick="alert('Exporting PDF...')">📊 Download PDF</button>
+    </div>
+</div>
+
+<div class="card">
+    <table class="gov-table">
+        <thead>
+            <tr>
+                <th>District</th>
+                <th>State</th>
+                <th>Regime Context</th>
+                <th>Raw NWP (mm)</th>
+                <th>Corrected (mm)</th>
+                <th>Change (%)</th>
+                <th>Heavy Rain Prob (%)</th>
+                <th>Alert Level (IMD Standard)</th>
+            </tr>
+        </thead>
+        <tbody id="forecastTable">
+            <tr><td colspan="8" style="text-align: center;">Loading data...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function loadData() {
+        const state = document.getElementById('stateSelect').value;
+        const url = state ? `/api/forecast-data?state=${encodeURIComponent(state)}` : '/api/forecast-data';
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                const tbody = document.getElementById('forecastTable');
+                tbody.innerHTML = '';
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No data found for this selection.</td></tr>';
+                    return;
+                }
+                
+                data.forEach(d => {
+                    const change = (((d.corrected - d.raw) / d.raw) * 100).toFixed(1);
+                    const changeStr = change > 0 ? `+${change}%` : `${change}%`;
+                    const changeColor = change > 0 ? 'green' : 'red';
+                    
+                    let alertCls = 'alert-green';
+                    let alertTxt = 'No Warning (Green)';
+                    
+                    if (d.corrected > 115.5) { alertCls = 'alert-red'; alertTxt = 'Take Action (Red)'; }
+                    else if (d.corrected > 64.5) { alertCls = 'alert-orange'; alertTxt = 'Be Prepared (Orange)'; }
+                    else if (d.corrected > 15.5) { alertCls = 'alert-yellow'; alertTxt = 'Be Updated (Yellow)'; }
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><strong>${d.district}</strong></td>
+                            <td>${d.state}</td>
+                            <td>${d.regime}</td>
+                            <td>${d.raw}</td>
+                            <td style="font-weight:bold;">${d.corrected}</td>
+                            <td style="color:${changeColor}">${changeStr}</td>
+                            <td>${d.prob_heavy}%</td>
+                            <td><span class="${alertCls}">${alertTxt}</span></td>
+                        </tr>
+                    `;
+                });
+            });
+    }
+    
+    // Initial load
+    document.addEventListener('DOMContentLoaded', loadData);
+</script>
+{% endblock %}

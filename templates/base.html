@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="VarshaNet 2.0 - Regime-Aware Rainfall Post-Processing System">
+    <title>VarshaNet 2.0 | NCMRWF | MoES</title>
+    <!-- System fonts for Govt look -->
+    <style>
+        :root {
+            --govt-blue: #003366;
+            --govt-navy: #1a1a2e;
+            --saffron: #FF9933;
+            --green: #138808;
+            --light-bg: #f4f6f9;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: #333;
+        }
+        .tricolor-strip {
+            height: 12px;
+            display: flex;
+        }
+        .tricolor-strip div {
+            flex: 1;
+        }
+        .saffron-bg { background-color: var(--saffron); }
+        .white-bg { background-color: #FFFFFF; }
+        .green-bg { background-color: var(--green); }
+        
+        .header {
+            background-color: var(--govt-blue);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-center {
+            text-align: center;
+        }
+        .header h1 { margin: 5px 0; font-size: 1.5em; }
+        .header h2 { margin: 3px 0; font-size: 1.1em; font-weight: normal; }
+        .header h3 { margin: 0; font-size: 0.9em; font-weight: normal; }
+        
+        .navbar {
+            background-color: var(--govt-navy);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-size: 14px;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            text-decoration: underline;
+            color: var(--saffron);
+        }
+        .hindi-toggle {
+            background: none;
+            border: 1px solid white;
+            color: white;
+            padding: 2px 8px;
+            cursor: pointer;
+        }
+        
+        main {
+            padding: 20px;
+            min-height: 60vh;
+        }
+        
+        .footer {
+            background-color: var(--govt-navy);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: space-around;
+            font-size: 14px;
+        }
+        .footer-bottom {
+            background-color: #0b0b14;
+            color: #aaa;
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+        }
+        
+        /* Utility classes */
+        .card {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .gov-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .gov-table th {
+            background-color: var(--govt-blue);
+            color: white;
+            padding: 10px;
+            text-align: left;
+        }
+        .gov-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .gov-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--saffron);
+            color: white;
+            padding: 8px;
+            z-index: 100;
+        }
+        .skip-link:focus {
+            top: 0;
+        }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <div class="tricolor-strip">
+        <div class="saffron-bg"></div>
+        <div class="white-bg"></div>
+        <div class="green-bg"></div>
+    </div>
+    
+    <header class="header">
+        <div class="header-left" style="display: flex; align-items: center; gap: 10px;">
+            <div style="font-size: 3em;">☸</div>
+            <div style="text-align: center; line-height: 1.2;">
+                <div>सत्यमेव जयते</div>
+                <div style="font-size: 0.8em; font-weight: bold;">GOVERNMENT<br>OF INDIA</div>
+            </div>
+        </div>
+        <div class="header-center">
+            <h3>भारत सरकार | Government of India</h3>
+            <h2>पृथ्वी विज्ञान मंत्रालय | Ministry of Earth Sciences</h2>
+            <h2>National Centre for Medium Range Weather Forecasting (NCMRWF)</h2>
+            <h1>VarshaNet 2.0 — Regime-Aware Rainfall Post-Processing System</h1>
+        </div>
+        <div class="header-right" style="display: flex; gap: 15px; align-items: center;">
+            <div style="width: 50px; height: 50px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--govt-blue); font-size: 10px; font-weight: bold; text-align: center;">NCMRWF<br>LOGO</div>
+            <div style="width: 50px; height: 50px; background: #fff; border-radius: 5px; display: flex; align-items: center; justify-content: center; color: var(--govt-blue); font-size: 10px; font-weight: bold; text-align: center;">Swachh<br>Bharat</div>
+        </div>
+    </header>
+    
+    <nav class="navbar">
+        <div class="nav-links">
+            <a href="/">Home</a>
+            <a href="/dashboard">Dashboard</a>
+            <a href="/regime">Regime Classification</a>
+            <a href="/forecast">District Forecast</a>
+            <a href="/verification">Verification</a>
+            <a href="/about">About</a>
+        </div>
+        <div>
+            <button class="hindi-toggle">हिन्दी</button>
+        </div>
+    </nav>
+    
+    <main id="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer">
+        <div>
+            <h4>Quick Links</h4>
+            <ul style="list-style: none; padding: 0;">
+                <li><a href="#" style="color: white; text-decoration: none;">MoES</a></li>
+                <li><a href="#" style="color: white; text-decoration: none;">IMD</a></li>
+                <li><a href="#" style="color: white; text-decoration: none;">INCOIS</a></li>
+                <li><a href="#" style="color: white; text-decoration: none;">IITM</a></li>
+            </ul>
+        </div>
+        <div>
+            <h4>Contact Us</h4>
+            <p>A-50, Sector-62, Institution Area<br>
+            Noida, Uttar Pradesh - 201309<br>
+            Phone: +91-120-2419570<br>
+            Email: director@ncmrwf.gov.in</p>
+        </div>
+        <div>
+            <h4>Disclaimer</h4>
+            <p style="max-width: 250px;">This is a prototype application. Forecasts and classifications provided here are for research and development purposes and should not be used for operational decision making.</p>
+        </div>
+    </footer>
+    <div class="footer-bottom">
+        <p>© 2024 NCMRWF, Ministry of Earth Sciences, Government of India. All Rights Reserved.</p>
+        <p>Designed & Developed by NCMRWF | Hosted by NIC | Last Updated: <span id="last-updated">27 Sep 2024</span> | Visitors: <span id="visitor-count">14,235</span></p>
+    </div>
+    
+    <script>
+        // Set active nav link
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname;
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                if (link.getAttribute('href') === currentPath || (currentPath === '' && link.getAttribute('href') === '/')) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Randomize visitors
+            const count = Math.floor(10000 + Math.random() * 90000);
+            document.getElementById('visitor-count').innerText = count.toLocaleString();
+            
+            // Set date
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            document.getElementById('last-updated').innerText = new Date().toLocaleDateString('en-GB', options);
+        });
+    </script>
+</body>
+</html>

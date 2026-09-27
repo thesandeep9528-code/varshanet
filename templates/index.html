@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .hero {
+        background-color: var(--govt-blue);
+        color: white;
+        padding: 40px 20px;
+        text-align: center;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .hero h2 { margin-top: 0; font-size: 2em; }
+    .hero p { max-width: 800px; margin: 0 auto; line-height: 1.6; }
+    
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .feature-card {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        text-align: center;
+        border-top: 4px solid var(--saffron);
+    }
+    .feature-icon {
+        font-size: 3em;
+        margin-bottom: 15px;
+    }
+    .feature-title {
+        font-weight: bold;
+        color: var(--govt-blue);
+        margin-bottom: 10px;
+    }
+    
+    .marquee-container {
+        background: #ffeeba;
+        color: #856404;
+        padding: 10px;
+        border: 1px solid #ffeeba;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+    }
+    .marquee-label {
+        font-weight: bold;
+        padding-right: 15px;
+        white-space: nowrap;
+        background: #ffeeba;
+        z-index: 2;
+    }
+    .marquee-content {
+        overflow: hidden;
+    }
+    .marquee-content p {
+        margin: 0;
+        white-space: nowrap;
+        animation: marquee 20s linear infinite;
+    }
+    @keyframes marquee {
+        0% { transform: translateX(100%); }
+        100% { transform: translateX(-100%); }
+    }
+    
+    .stats-row {
+        display: flex;
+        justify-content: space-around;
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+    .stat-item {
+        text-align: center;
+    }
+    .stat-value {
+        font-size: 2em;
+        font-weight: bold;
+        color: var(--green);
+    }
+    .stat-label {
+        color: #666;
+        font-size: 0.9em;
+        text-transform: uppercase;
+    }
+    
+    .bulletin {
+        background: white;
+        padding: 20px;
+        border-radius: 5px;
+        border-left: 5px solid var(--govt-blue);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .bulletin h3 { margin-top: 0; color: var(--govt-blue); }
+</style>
+
+<div class="marquee-container">
+    <div class="marquee-label">LATEST WARNINGS:</div>
+    <div class="marquee-content">
+        <p>⚠️ Heavy to very heavy rainfall very likely over isolated places of Konkan & Goa, Coastal Karnataka. ⚠️ Thunderstorm with lightning expected over Central India. ⚠️ Stay updated with IMD guidelines.</p>
+    </div>
+</div>
+
+<div class="hero">
+    <h2>Welcome to VarshaNet 2.0</h2>
+    <p>A state-of-the-art regime-aware monsoon rainfall post-processing system designed to enhance Numerical Weather Prediction (NWP) outputs. Utilizing advanced machine learning for regime classification and bias correction, VarshaNet 2.0 significantly improves the accuracy of district-level quantitative precipitation forecasts over India.</p>
+</div>
+
+<div class="stats-row">
+    <div class="stat-item">
+        <div class="stat-value">718</div>
+        <div class="stat-label">Districts Covered</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">36</div>
+        <div class="stat-label">States & UTs</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">~24%</div>
+        <div class="stat-label">Forecast Improvement</div>
+    </div>
+    <div class="stat-item">
+        <div class="stat-value">12km</div>
+        <div class="stat-label">Model Resolution</div>
+    </div>
+</div>
+
+<div class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">🌀</div>
+        <div class="feature-title">Regime Classification</div>
+        <p>Identifies synoptic meteorological regimes like Active Monsoon, Break Monsoon, and Depressions using multi-variate analysis.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <div class="feature-title">Bias Correction</div>
+        <p>Applies regime-specific statistical correction to NWP forecasts to mitigate systematic model errors.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">⛈️</div>
+        <div class="feature-title">Heavy Rainfall Alerts</div>
+        <p>Generates probabilities of heavy and very heavy rainfall events for actionable disaster management.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <div class="feature-title">Verification</div>
+        <p>Comprehensive skill score analysis including RMSE, ETS, and CSI to continuously monitor system performance.</p>
+    </div>
+</div>
+
+<div class="bulletin">
+    <h3>Daily Summary Bulletin — {{ date }}</h3>
+    <p><strong>Current Dominant Regime:</strong> Active Monsoon over Central India.</p>
+    <p><strong>Key Highlights:</strong> The NWP model indicates a low-pressure area forming over the Bay of Bengal. Bias-corrected forecasts suggest an increased likelihood of heavy rainfall across coastal Andhra Pradesh and Odisha over the next 48 hours. Break monsoon conditions observed over Northwest India.</p>
+    <p><strong>System Status:</strong> All post-processing pipelines operating normally. Latest NCUM/GFS 00Z cycle processed successfully.</p>
+</div>
+
+<div style="margin-top: 20px;">
+    <h3 style="border-left: 4px solid #003366; padding-left: 10px; color: #003366;">Important Links</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px;">
+        <a href="https://moes.gov.in" target="_blank" style="display:block; background:white; padding:12px 15px; border:1px solid #ddd; text-decoration:none; color:#003366; font-weight:bold; border-left: 3px solid #FF9933;">🏛️ Ministry of Earth Sciences</a>
+        <a href="https://mausam.imd.gov.in" target="_blank" style="display:block; background:white; padding:12px 15px; border:1px solid #ddd; text-decoration:none; color:#003366; font-weight:bold; border-left: 3px solid #FF9933;">🌤️ India Meteorological Department</a>
+        <a href="https://www.ncmrwf.gov.in" target="_blank" style="display:block; background:white; padding:12px 15px; border:1px solid #ddd; text-decoration:none; color:#003366; font-weight:bold; border-left: 3px solid #FF9933;">🔬 NCMRWF</a>
+        <a href="https://www.iitm.ac.in" target="_blank" style="display:block; background:white; padding:12px 15px; border:1px solid #ddd; text-decoration:none; color:#003366; font-weight:bold; border-left: 3px solid #138808;">🧪 IITM Pune</a>
+        <a href="https://www.incois.gov.in" target="_blank" style="display:block; background:white; padding:12px 15px; border:1px solid #ddd; text-decoration:none; color:#003366; font-weight:bold; border-left: 3px solid #138808;">🌊 INCOIS</a>
+        <a href="https://india.gov.in" target="_blank" style="display:block; background:white; padding:12px 15px; border:1px solid #ddd; text-decoration:none; color:#003366; font-weight:bold; border-left: 3px solid #138808;">🇮🇳 National Portal of India</a>
+    </div>
+</div>
+{% endblock %}
